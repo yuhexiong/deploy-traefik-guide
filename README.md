@@ -20,10 +20,13 @@ greatly simplifying the deployment process and improving flexibility.
 
 ## Preparation
 
-1. **Unify API path**
-   Ensure all backend API paths start with `/api`, so Traefik can correctly determine routing.
+1. **Unify API Paths**  
+   Ensure that all backend API endpoints start with `/api` so that Traefik can properly handle routing.
 
-2. **Build images**
+2. **Build the Image**  
+   Previously, the frontend `.env` file might have been configured with a value like `http://<server-ip>/api`.
+   Now, you only need to use `/api`. The actual server location (IP or domain) will be managed by the reverse proxy, so there’s no need to include it in the `.env` file or the build output.
+
 
 ## Run
 
