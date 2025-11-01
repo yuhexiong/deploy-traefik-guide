@@ -74,7 +74,7 @@ Traefik 負責反向代理與路由控制：
 ### Frontend Service
 
 前端服務僅接受從 `web_frontend`（port 3000）進來的請求。  
-使用 `PathPrefix(`/`)` 代理所有靜態資源，優先度設為較低（1）。
+使用 `PathPrefix(/)` 代理所有靜態資源，優先度設為較低（1），優先度為數字大者優先。
 
 ```yaml
 labels:
@@ -94,7 +94,7 @@ labels:
 * `web_frontend`（前端打 `/api` 時導向後端） 
 * `web_api`（可直接測試 API 或查看 Swagger）
 
-設定 `PathPrefix(/api)` 以區分路由，優先度設為 2。  
+設定 `PathPrefix(/api)` 以區分路由，優先度設為 2，優先度為數字大者優先。  
 並透過 middleware 處理 CORS。
 
 ```yaml

@@ -73,7 +73,7 @@ Traefik handles reverse proxying and routing control:
 ### Frontend Service
 
 The frontend service only accepts requests coming from `web_frontend` (port 3000).  
-Use `PathPrefix(`/`)` to proxy all static assets, with a lower priority (1).
+Use `PathPrefix(/)` to proxy all static assets, with a lower priority (1). Priority is determined by the larger number taking precedence.
 
 ```yaml
 labels:
@@ -92,7 +92,7 @@ The backend service is accessible from both:
 * `web_frontend` (when the frontend calls `/api`)
 * `web_api` (for direct API testing or viewing Swagger)
 
-Set `PathPrefix(/api)` to distinguish routes, with a higher priority (2).  
+Set `PathPrefix(/api)` to distinguish routes, with a higher priority (2). Priority is determined by the larger number taking precedence.  
 Handle CORS through middleware.
 
 ```yaml
