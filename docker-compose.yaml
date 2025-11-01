@@ -60,12 +60,11 @@ services:
 
       - "traefik.http.routers.server-api.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.server-api.entrypoints=web_frontend,web_api"
-      - "traefik.http.routers.server-api.priority=2"
       - "traefik.http.routers.server-api.service=server-api"
+      - "traefik.http.services.server-api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.server-api.priority=2"
       
       - "traefik.http.routers.server-api.middlewares=cors-header@docker"
-      - "traefik.http.services.server-api.loadbalancer.server.port=8000"
-
       - "traefik.http.middlewares.cors-header.headers.accessControlAllowOriginList=*"
       - "traefik.http.middlewares.cors-header.headers.accessControlAllowMethods=GET,OPTIONS,PUT,POST,DELETE"
       - "traefik.http.middlewares.cors-header.headers.accessControlAllowHeaders=*"
