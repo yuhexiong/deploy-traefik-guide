@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    networks:
+      - server_network
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+
+      - --entrypoints.web_frontend.address=:3000
+      - --entrypoints.web_api.address=:8000
+
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --accesslog=true
+      - --accesslog.fields.defaultmode=drop
+      - --accesslog.fields.names.EntryPoint=keep
+      - --accesslog.fields.names.RouterName=keep
+      - --accesslog.fields.names.ServiceName=keep
+      - --accesslog.fields.names.RequestPath=keep
+      - --accesslog.fields.names.DownstreamStatus=keep
+    ports:
+      - 3000:3000
+      - 8000:8000
+      - 8080:8080 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  server-frontend:
+    container_name: server-frontend
+    image: server-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - server_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.server-frontend.entrypoints=web_frontend"
+      - "traefik.http.routers.server-frontend.service=server-frontend"
+      - "traefik.http.services.server-frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.server-frontend.priority=1"
+
+  server-backend:
+    container_name: server-backend
+    image: server-backend
+    restart: always
+    tty: true
+    networks:
+      - server_network
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.server-api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.server-api.entrypoints=web_frontend,web_api"
+      - "traefik.http.routers.server-api.priority=2"
+      - "traefik.http.routers.server-api.service=server-api"
+      
+      - "traefik.http.routers.server-api.middlewares=cors-header@docker"
+      - "traefik.http.services.server-api.loadbalancer.server.port=8000"
+
+      - "traefik.http.middlewares.cors-header.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.cors-header.headers.accessControlAllowMethods=GET,OPTIONS,PUT,POST,DELETE"
+      - "traefik.http.middlewares.cors-header.headers.accessControlAllowHeaders=*"
+      - "traefik.http.middlewares.cors-header.headers.accessControlAllowCredentials=true"
+
+networks:
+  server_network:
+    driver: bridge
